@@ -7,10 +7,10 @@ import time
 
 s = requests.Session()
 
-username = ""
-password = ""
+username = "13328360390"
+password = "3800589d"
 
-if(username == "" or password == ""):
+if(username == "13328360390" or password == "3800589d"):
     username = input("账号：")
     password = input("密码：")
 
