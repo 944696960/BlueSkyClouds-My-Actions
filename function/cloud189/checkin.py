@@ -1,134 +1,31 @@
-# 脚本来源：https://github.com/t00t00-crypto/cloud189-action/blob/master/checkin.py
-import base64
-import re
 import requests
-import rsa
-import time
 
-s = requests.Session()
+cookies = {
+    'apm_ct': '20210811223811619',
+    'apm_ip': '84C6C75AF24B2DA68BFE666EA2616A41',
+    'apm_sid': 'E77AFC9AD0263B7DF408A9CF33750721',
+    'apm_ua': 'CB1E39D6CD2B969C34B0A2CC0B0B2008',
+    'apm_uid': 'D728053A4B076A72E2837D5FBA212891',
+    'COOKIE_LOGIN_USER': '66DF1CAA089B94B92D7BC259C3D09366019B3B10F9A6A8D595E4900B81D6B05966FD77478A6211D8CB7E51D5F69C8B8D379FFA3DA5C7E099416909A7',
+    'JSESSIONID': 'aaacYOjAL0WA75SxppaMx',
+}
 
-username = "13328360390"
-password = "3800589d"
+headers = {
+    'Host': 'm.cloud.189.cn',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Accept': '*/*',
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Ecloud/8.9.4 iOS/14.2 clientId/AFEDEC7B-5907-4320-9FDA-B1A1C100D959 clientModel/iPhone proVersion/1.0.5',
+    'Referer': 'https://m.cloud.189.cn/zhuanti/2016/sign/index.jsp?albumBackupOpened=0',
+    'Accept-Language': 'zh-cn',
+    'X-Requested-With': 'XMLHttpRequest',
+}
 
+params = (
+    ('taskId', 'TASK_SIGNIN'),
+    ('activityId', 'ACT_SIGNIN'),
+    ('noCache', '0.20524460452901994'),
+)
 
+response = requests.get('https://m.cloud.189.cn/v2/drawPrizeMarketDetails.action', headers=headers, params=params, cookies=cookies)
 
-def main():
-    login(username, password)
-    rand = str(round(time.time()*1000))
-    surl = f'https://api.cloud.189.cn/mkt/userSign.action?rand={rand}&clientType=TELEANDROID&version=8.6.3&model=SM-G930K'
-    url = f'https://m.cloud.189.cn/v2/drawPrizeMarketDetails.action?taskId=TASK_SIGNIN&activityId=ACT_SIGNIN'
-    url2 = f'https://m.cloud.189.cn/v2/drawPrizeMarketDetails.action?taskId=TASK_SIGNIN_PHOTOS&activityId=ACT_SIGNIN'
-    headers = {
-        'User-Agent':'Mozilla/5.0 (Linux; Android 5.1.1; SM-G930K Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Ecloud/8.6.3 Android/22 clientId/355325117317828 clientModel/SM-G930K imsi/460071114317824 clientChannelId/qq proVersion/1.0.6',
-        "Referer" : "https://m.cloud.189.cn/zhuanti/2016/sign/index.jsp?albumBackupOpened=1",
-        "Host" : "m.cloud.189.cn",
-        "Accept-Encoding" : "gzip, deflate",
-    }
-    response = s.get(surl,headers=headers)
-    netdiskBonus = response.json()['netdiskBonus']
-    if(response.json()['isSign'] == "false"):
-        print(f"未签到，签到获得{netdiskBonus}M空间")
-    else:
-        print(f"已经签到过了，签到获得{netdiskBonus}M空间")
-    headers = {
-        'User-Agent':'Mozilla/5.0 (Linux; Android 5.1.1; SM-G930K Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Ecloud/8.6.3 Android/22 clientId/355325117317828 clientModel/SM-G930K imsi/460071114317824 clientChannelId/qq proVersion/1.0.6',
-        "Referer" : "https://m.cloud.189.cn/zhuanti/2016/sign/index.jsp?albumBackupOpened=1",
-        "Host" : "m.cloud.189.cn",
-        "Accept-Encoding" : "gzip, deflate",
-    }
-    response = s.get(url,headers=headers)
-    if ("errorCode" in response.text):
-        print(response.text)
-    else:
-        description = response.json()['description']
-        print(f"抽奖获得{description}")
-    response = s.get(url2,headers=headers)
-    if ("errorCode" in response.text):
-        print(response.text)
-    else:
-        description = response.json()['description']
-        print(f"抽奖获得{description}")
-
-BI_RM = list("0123456789abcdefghijklmnopqrstuvwxyz")
-def int2char(a):
-    return BI_RM[a]
-
-b64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-def b64tohex(a):
-    d = ""
-    e = 0
-    c = 0
-    for i in range(len(a)):
-        if list(a)[i] != "=":
-            v = b64map.index(list(a)[i])
-            if 0 == e:
-                e = 1
-                d += int2char(v >> 2)
-                c = 3 & v
-            elif 1 == e:
-                e = 2
-                d += int2char(c << 2 | v >> 4)
-                c = 15 & v
-            elif 2 == e:
-                e = 3
-                d += int2char(c)
-                d += int2char(v >> 2)
-                c = 3 & v
-            else:
-                e = 0
-                d += int2char(c << 2 | v >> 4)
-                d += int2char(15 & v)
-    if e == 1:
-        d += int2char(c << 2)
-    return d
-
-
-def rsa_encode(j_rsakey, string):
-    rsa_key = f"-----BEGIN PUBLIC KEY-----\n{j_rsakey}\n-----END PUBLIC KEY-----"
-    pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(rsa_key.encode())
-    result = b64tohex((base64.b64encode(rsa.encrypt(f'{string}'.encode(), pubkey))).decode())
-    return result
-
-def calculate_md5_sign(params):
-    return hashlib.md5('&'.join(sorted(params.split('&'))).encode('utf-8')).hexdigest()
-
-def login(username, password):
-    url = "https://cloud.189.cn/udb/udb_login.jsp?pageId=1&redirectURL=/main.action"
-    r = s.get(url)
-    captchaToken = re.findall(r"captchaToken' value='(.+?)'", r.text)[0]
-    lt = re.findall(r'lt = "(.+?)"', r.text)[0]
-    returnUrl = re.findall(r"returnUrl = '(.+?)'", r.text)[0]
-    paramId = re.findall(r'paramId = "(.+?)"', r.text)[0]
-    j_rsakey = re.findall(r'j_rsaKey" value="(\S+)"', r.text, re.M)[0]
-    s.headers.update({"lt": lt})
-
-    username = rsa_encode(j_rsakey, username)
-    password = rsa_encode(j_rsakey, password)
-    url = "https://open.e.189.cn/api/logbox/oauth2/loginSubmit.do"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/76.0',
-        'Referer': 'https://open.e.189.cn/',
-        }
-    data = {
-        "appKey": "cloud",
-        "accountType": '01',
-        "userName": f"{{RSA}}{username}",
-        "password": f"{{RSA}}{password}",
-        "validateCode": "",
-        "captchaToken": captchaToken,
-        "returnUrl": returnUrl,
-        "mailSuffix": "@189.cn",
-        "paramId": paramId
-        }
-    r = s.post(url, data=data, headers=headers, timeout=5)
-    if(r.json()['result'] == 0):
-        print(r.json()['msg'])
-    else:
-        print(r.json()['msg'])
-    redirect_url = r.json()['toUrl']
-    r = s.get(redirect_url)
-    return s
-
-
-if __name__ == "__main__":
-    main()
