@@ -29,3 +29,37 @@ params = (
 
 response = requests.get('https://m.cloud.189.cn/v2/drawPrizeMarketDetails.action', headers=headers, params=params, cookies=cookies)
 
+
+
+import requests
+
+headers = {
+    'Host': 'api.cloud.189.cn',
+    'Accept-Language': 'zh-cn',
+    'Connection': 'keep-alive',
+    'Signature': 'fc96e8b95fc64ea3644f597c2a3ddfdaac5f06c9',
+    'Date': 'Wed, 11 Aug 2021 14:38:06 GMT',
+    'Accept': '*/*',
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Ecloud/8.9.4 (iPhone; AFEDEC7B-5907-4320-9FDA-B1A1C100D959; appStore) iOS/14.2',
+    'sessionKey': '995005a6-e30e-4dd3-a010-14a95a01e683',
+    'Accept-Encoding': 'gzip',
+    'X-Request-ID': '78EAC5C992F647BDB1F64E9EA1F1FEB5',
+}
+
+params = (
+    ('clientType', 'TELEIPHONE'),
+    ('version', '8.9.4'),
+    ('model', 'iPhone'),
+    ('osFamily', 'iOS'),
+    ('osVersion', '14.2'),
+    ('clientSn', 'AFEDEC7B-5907-4320-9FDA-B1A1C100D959'),
+)
+
+response = requests.get('https://api.cloud.189.cn/mkt/userSign.action', headers=headers, params=params)
+
+#NB. Original query string below. It seems impossible to parse and
+#reproduce query strings 100% accurately so the one below is given
+#in case the reproduced version is not "correct".
+# response = requests.get('https://api.cloud.189.cn/mkt/userSign.action?clientType=TELEIPHONE&version=8.9.4&model=iPhone&osFamily=iOS&osVersion=14.2&clientSn=AFEDEC7B-5907-4320-9FDA-B1A1C100D959', headers=headers)
+
+
